@@ -10,8 +10,35 @@ import TeamInvitations from './hackathon/TeamInvitations';
 import InternshipPendingInvitations from './internship/PendingInvitations';
 import { getCourses } from '../services/courseService';
 
+const IPFS_GATEWAYS = [
+  'https://gateway.pinata.cloud/ipfs/',
+  'https://w3s.link/ipfs/',
+  'https://ipfs.io/ipfs/',
+];
+
+const getIpfsGatewayUrls = (uri) => {
+  if (!uri || typeof uri !== 'string') return [];
+
+  if (uri.startsWith('ipfs://')) {
+    const ipfsPath = uri.slice('ipfs://'.length).replace(/^ipfs\//, '');
+    return IPFS_GATEWAYS.map((gateway) => `${gateway}${ipfsPath}`);
+  }
+
+  const ipfsPath = uri.match(/\/ipfs\/(.+)$/)?.[1];
+  if (ipfsPath) {
+    return [
+      uri,
+      ...IPFS_GATEWAYS
+        .map((gateway) => `${gateway}${ipfsPath}`)
+        .filter((gatewayUrl) => gatewayUrl !== uri),
+    ];
+  }
+
+  return [uri];
+};
+
 export default function Profile() {
-  const { currentUser, logout } = useAuth();
+  const { currentUser, logout, fetchUserProfile } = useAuth();
 
   const [loading, setLoading] = useState(true);
   const [certificates, setCertificates] = useState([]);
@@ -20,10 +47,33 @@ export default function Profile() {
   const [registeredHackathons, setRegisteredHackathons] = useState([]);
   const [showTooltip, setShowTooltip] = useState(false);
   const [coursesMap, setCoursesMap] = useState({});
+  const [mobileNumber, setMobileNumber] = useState('');
+  const [savingMobile, setSavingMobile] = useState(false);
+  const [mobileMessage, setMobileMessage] = useState('');
 
   // Profile image
   const [profileImage, setProfileImage] = useState(null);
   const fileInputRef = useRef(null);
+
+  const saveMobileNumber = async (event) => {
+    event.preventDefault();
+    setSavingMobile(true);
+    setMobileMessage('');
+    try {
+      const token = localStorage.getItem('token');
+      const baseUrl = import.meta.env.VITE_BACKEND_URL || 'https://nft-project-2y3b.onrender.com';
+      await axios.patch(`${baseUrl}/api/auth/profile/phone`, { phoneNumber: mobileNumber }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      await fetchUserProfile(token);
+      setMobileNumber('');
+      setMobileMessage('Mobile number saved. Organizer requests can now call you.');
+    } catch (error) {
+      setMobileMessage(error.response?.data?.message || 'Could not save mobile number.');
+    } finally {
+      setSavingMobile(false);
+    }
+  };
 
   // --------------------------------------------------
   // PROFILE IMAGE
@@ -859,20 +909,18 @@ export default function Profile() {
         let metadata = {};
 
         try {
-          let metadataUrl = tokenURI;
-
-          if (metadataUrl?.startsWith("ipfs://")) {
-            metadataUrl = metadataUrl.replace(
-              "ipfs://",
-              "https://ipfs.io/ipfs/"
-            );
-          }
-
-          if (metadataUrl) {
-            const response = await fetch(metadataUrl);
-
-            if (response.ok) {
-              metadata = await response.json();
+          for (const metadataUrl of getIpfsGatewayUrls(tokenURI)) {
+            try {
+              const response = await fetch(metadataUrl);
+              if (response.ok) {
+                metadata = await response.json();
+                break;
+              }
+            } catch (gatewayError) {
+              console.warn(
+                `Metadata gateway failed for token ${tokenId}:`,
+                gatewayError
+              );
             }
           }
         } catch (error) {
@@ -1307,6 +1355,30 @@ export default function Profile() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-100 pb-12">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+
+        {!currentUser.phoneNumber && (
+          <form onSubmit={saveMobileNumber} className="mt-6 p-5 bg-white rounded-xl shadow-md">
+            <h2 className="text-lg font-semibold text-gray-800">Add your mobile number</h2>
+            <p className="text-sm text-gray-600 mt-1">Your account has no saved number yet, so internship certificate calls cannot reach you.</p>
+            <div className="mt-3 flex flex-col sm:flex-row gap-3">
+              <input
+                type="tel"
+                required
+                inputMode="tel"
+                autoComplete="tel"
+                pattern="[+0-9() -]{10,20}"
+                placeholder="9876543210 or +919876543210"
+                value={mobileNumber}
+                onChange={(event) => setMobileNumber(event.target.value)}
+                className="flex-1 rounded-lg border border-gray-300 px-4 py-2"
+              />
+              <button type="submit" disabled={savingMobile} className="rounded-lg bg-purple-600 px-5 py-2 font-medium text-white disabled:opacity-60">
+                {savingMobile ? 'Saving…' : 'Save number'}
+              </button>
+            </div>
+            {mobileMessage && <p className="mt-2 text-sm text-gray-700">{mobileMessage}</p>}
+          </form>
+        )}
 
         {/* Share Profile */}
         <div className="flex justify-end pt-8 mb-2 relative">
@@ -2077,22 +2149,24 @@ export default function Profile() {
                           >
                             <div className="relative">
                               <img
-                                src={
-                                  cert.metadata?.image
-                                    ? cert.metadata.image.replace(
-                                        'ipfs://',
-                                        'https://ipfs.io/ipfs/'
-                                      )
-                                    : '/placeholder-certificate.png'
-                                }
+                                src={getIpfsGatewayUrls(cert.metadata?.image)[0] || '/placeholder-certificate.png'}
+                                data-gateway-index="0"
                                 alt={
                                   cert.metadata?.name ||
                                   'Certificate'
                                 }
                                 className="w-full h-48 object-cover"
                                 onError={(e) => {
-                                  e.currentTarget.src =
-                                    '/placeholder-certificate.png';
+                                  const image = e.currentTarget;
+                                  const gatewayUrls = getIpfsGatewayUrls(cert.metadata?.image);
+                                  const nextGatewayIndex = Number(image.dataset.gatewayIndex || 0) + 1;
+
+                                  if (nextGatewayIndex < gatewayUrls.length) {
+                                    image.dataset.gatewayIndex = String(nextGatewayIndex);
+                                    image.src = gatewayUrls[nextGatewayIndex];
+                                  } else {
+                                    image.src = '/placeholder-certificate.png';
+                                  }
                                 }}
                               />
 

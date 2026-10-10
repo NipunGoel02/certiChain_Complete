@@ -5,7 +5,14 @@ const CertificateRequestSchema = new mongoose.Schema({
   status: { type: String, enum: ['pending', 'accepted', 'minted', 'rejected'], default: 'pending' },
   requestedAt: { type: Date, default: Date.now },
   mintedAt: { type: Date },
-  certificateType: { type: String, enum: ['participation', 'completion'], default: 'participation' }
+  certificateType: { type: String, enum: ['participation', 'completion'], default: 'participation' },
+  outboundCallStatus: {
+    type: String,
+    enum: ['not_attempted', 'started', 'failed', 'skipped_missing_phone'],
+    default: 'not_attempted'
+  },
+  outboundCallError: { type: String, default: '' },
+  outboundCallStartedAt: { type: Date }
 });
 
 const InternshipSchema = new mongoose.Schema({

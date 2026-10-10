@@ -209,10 +209,9 @@
     );
     console.log('=================================');
 
-    // IMPORTANT:
-    // Metadata mein HTTP gateway URL use kar rahe hain
-    // taaki wallets/marketplaces image easily resolve kar saken.
-    return `${PINATA_GATEWAY}/${imageCID}`;
+    // Keep the image as an IPFS URI in NFT metadata so wallets can resolve it
+    // through their own IPFS gateway instead of depending on one HTTP gateway.
+    return `ipfs://${imageCID}`;
   };
 
 

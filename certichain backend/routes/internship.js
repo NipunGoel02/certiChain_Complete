@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const Internship = require('../models/Internship');
 const User = require('../models/User');
 const { auth: authMiddleware, isInternshipOrganizer } = require('../middleware/auth');
+const { startCertificateCall } = require('../services/livekitCalls');
 
 // POST /api/internships - internship organizer fills internship form including user email
 router.post('/', authMiddleware, isInternshipOrganizer, async (req, res) => {
@@ -14,7 +15,7 @@ router.post('/', authMiddleware, isInternshipOrganizer, async (req, res) => {
     }
 
     // Find participant user by email
-    const participant = await User.findOne({ email: participantEmail });
+    const participant = await User.findOne({ email: participantEmail.trim().toLowerCase() });
     if (!participant) {
       return res.status(404).json({ message: 'Participant user not found by email' });
     }
@@ -37,10 +38,42 @@ router.post('/', authMiddleware, isInternshipOrganizer, async (req, res) => {
 
     await internship.save();
 
-    // TODO: Send notification to participant email to mint certificate
-    // This can be implemented with email service or notification system
+    const certificateRequest = internship.certificateRequests[0];
+    let callStatus = 'skipped_missing_phone';
 
-    res.status(201).json(internship);
+    if (participant.phoneNumber) {
+      try {
+        const organizer = await User.findById(req.user.id).select('name');
+        await startCertificateCall({
+          phoneNumber: participant.phoneNumber,
+          participantId: participant._id.toString(),
+          participantName: participant.name,
+          organizerName: organizer?.name || 'the internship organizer',
+          internshipTitle: internship.title,
+          certificateType,
+          requestId: certificateRequest._id.toString()
+        });
+        certificateRequest.outboundCallStatus = 'started';
+        certificateRequest.outboundCallStartedAt = new Date();
+        callStatus = 'started';
+      } catch (callError) {
+        console.error('Could not start internship certificate call:', callError.message);
+        certificateRequest.outboundCallStatus = 'failed';
+        certificateRequest.outboundCallError = 'The phone call could not be started.';
+        callStatus = 'failed';
+      }
+    } else {
+      certificateRequest.outboundCallStatus = 'skipped_missing_phone';
+      certificateRequest.outboundCallError = 'The participant account has no saved phone number.';
+    }
+
+    await internship.save();
+
+    res.status(201).json({
+      message: 'Internship certificate request created.',
+      internshipId: internship._id,
+      callStatus
+    });
   } catch (error) {
     console.error('Error submitting internship form:', error);
     res.status(500).json({ message: 'Failed to submit internship form' });

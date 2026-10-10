@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 export default function Signup() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [error, setError] = useState('');
@@ -19,7 +20,7 @@ export default function Signup() {
       return;
     }
     try {
-      await signup(name, email, password);
+      await signup(email, password, name, 'user', phoneNumber);
       navigate('/profile');
     } catch (err) {
       setError(err.message);
@@ -50,6 +51,22 @@ export default function Signup() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
+        </div>
+        <div className="mb-4">
+          <label>Mobile Number</label>
+          <input
+            type="tel"
+            required
+            autoComplete="tel"
+            inputMode="tel"
+            pattern="[+0-9() -]{10,20}"
+            title="Enter a valid mobile number, including country code if outside India"
+            placeholder="+91 98765 43210"
+            className="w-full p-2 border rounded"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+          />
+          <small className="text-gray-500">Used for internship certificate request calls.</small>
         </div>
         <div className="mb-4">
           <label>Password</label>

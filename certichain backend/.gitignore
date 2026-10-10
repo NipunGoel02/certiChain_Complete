@@ -1,0 +1,8 @@
+.env
+node_modules/
+uploads/
+voice_agent/.venv/
+voice_agent/.python-version
+voice_agent/__pycache__/
+voice_agent/src/__pycache__/
+voice_agent/.ruff_cache/

@@ -13,6 +13,16 @@ const mongoose = require('mongoose');
 
 const JWT_SECRET = 'supersecretkey12345'; // Must match middleware auth.js
 
+function normalizePhoneNumber(value) {
+  const input = String(value || '').trim().replace(/[\s()-]/g, '');
+  const e164Phone = input.startsWith('+')
+    ? input
+    : input.length === 10
+      ? `+91${input}`
+      : `+${input}`;
+  return /^\+[1-9]\d{7,14}$/.test(e164Phone) ? e164Phone : null;
+}
+
 // Multer setup for file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -44,13 +54,20 @@ const upload = multer({
 // Signup route
 // Signup route
 router.post('/signup', async (req, res) => {
-  const { name, email, password, role } = req.body; // Extract role from request
+  const { name, email, password, role, phoneNumber } = req.body;
   try {
+    if (!name || !email || !password || !phoneNumber) {
+      return res.status(400).json({ message: 'Name, email, password, and mobile number are required' });
+    }
+    const e164Phone = normalizePhoneNumber(phoneNumber);
+    if (!e164Phone) {
+      return res.status(400).json({ message: 'Enter a valid mobile number with country code' });
+    }
     let user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({ message: 'User already exists' });
     }
-    user = new User({ name, email, password, role }); // Include role when creating user
+    user = new User({ name, email, password, role, phoneNumber: e164Phone });
     await user.save();
 
     // Link any pending internship certificateRequests with this email to the new user
@@ -114,6 +131,28 @@ router.get('/profile', auth, async (req, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');
+  }
+});
+
+// Save a mobile number for existing accounts created before phone capture was added.
+router.patch('/profile/phone', auth, async (req, res) => {
+  try {
+    const phoneNumber = normalizePhoneNumber(req.body.phoneNumber);
+    if (!phoneNumber) {
+      return res.status(400).json({ message: 'Enter a valid mobile number with country code' });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    user.phoneNumber = phoneNumber;
+    await user.save();
+    res.json({ success: true, phoneNumber: user.phoneNumber });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: 'Failed to update mobile number' });
   }
 });
 

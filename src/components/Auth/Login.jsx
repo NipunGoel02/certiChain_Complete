@@ -7,6 +7,7 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [role, setRole] = useState('user');
   const [error, setError] = useState('');
   const [isSignUpMode, setIsSignUpMode] = useState(false);
@@ -29,7 +30,7 @@ export default function Login() {
   async function handleSignup(e) {
     e.preventDefault();
     try {
-      const user = await signup(email, password, username, role);
+      const user = await signup(email, password, username, role, phoneNumber);
       if (user?.role === 'admin') navigate('/admin');
       else if (user?.role === 'hackathon organizer') navigate('/organizer');
       else if (user?.role === 'internship') navigate('/internships');
@@ -75,6 +76,20 @@ export default function Login() {
             <div className={styles['input-field']}>
               <i className="fas fa-envelope"></i>
               <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            </div>
+            <div className={styles['input-field']}>
+              <i className="fas fa-phone"></i>
+              <input
+                type="tel"
+                placeholder="Mobile number (+91...)"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                autoComplete="tel"
+                inputMode="tel"
+                pattern="[+0-9() -]{10,20}"
+                title="Enter a valid mobile number, including country code if outside India"
+                required
+              />
             </div>
             <div className={styles['input-field']}>
               <i className="fas fa-lock"></i>

@@ -17,16 +17,16 @@ export function AuthProvider({ children }) {
   const getToken = () => localStorage.getItem('token');
 
   // Signup function with role parameter
-  async function signup(email, password, name, role = 'user') {
+  async function signup(email, password, name, role = 'user', phoneNumber = '') {
     const res = await fetch(`${API_BASE_URL}/api/auth/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password, role }),
+      body: JSON.stringify({ name, email, password, role, phoneNumber }),
     });
     const data = await res.json();
     if (res.ok) {
       localStorage.setItem('token', data.token);
-      await fetchUserProfile(data.token);
+      return await fetchUserProfile(data.token);
     } else {
       throw new Error(data.message || 'Signup failed');
     }

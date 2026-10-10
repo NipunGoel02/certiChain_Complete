@@ -30,11 +30,18 @@ const CreateInternship = () => {
       setLoading(true);
       setError(null);
       const token = localStorage.getItem('token');
-      await axios.post('/api/internships', formData, {
+      const response = await axios.post('/api/internships', formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setLoading(false);
-      alert('Internship created and notification sent to participant');
+      const callStatus = response.data?.callStatus;
+      if (callStatus === 'started') {
+        alert('Internship request created and the participant call was started.');
+      } else if (callStatus === 'failed') {
+        alert('Internship request was created, but the participant call could not be started.');
+      } else {
+        alert('Internship request was created. No call was made because the participant account has no saved mobile number.');
+      }
       navigate('/internships/my');
     } catch (err) {
       setLoading(false);

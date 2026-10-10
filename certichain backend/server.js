@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -34,11 +34,10 @@ app.use('/api/nft', nftRoutes);
 app.use('/api/userCompletion', userCompletionRoutes);
 app.use('/api/upload', uploadRoutes);
 
-const MONGO_URI = "mongodb+srv://nipungoel15:qahxnwKHzNPGrUwF@cluster0.p7n6x.mongodb.net/nft-certificate";
-
-
-
-
+const MONGO_URI = process.env.MONGO_URI;
+if (!MONGO_URI) {
+  throw new Error('MONGO_URI is required in certichain backend/.env');
+}
 
 // MongoDB connection
 mongoose.connect(MONGO_URI, {
