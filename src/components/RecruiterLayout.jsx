@@ -1,5 +1,5 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { Activity, BriefcaseBusiness, LogOut, Search } from 'lucide-react';
+import { Activity, BriefcaseBusiness, FileCheck2, LogOut, Search } from 'lucide-react';
 import { useAuth } from '../Context/AuthContext';
 
 export default function RecruiterLayout() {
@@ -21,6 +21,7 @@ export default function RecruiterLayout() {
         <nav aria-label="Recruiter workspace" className="flex items-center gap-1 rounded-full border border-primary-100 bg-primary-50/60 p-1">
           <NavLink to="/recruiter" end className={({ isActive }) => `inline-flex items-center gap-2 rounded-full px-3 py-2 text-[11px] font-semibold transition sm:px-4 sm:text-xs ${isActive ? 'bg-white text-primary-700 shadow-sm' : 'text-slate-500 hover:text-primary-700'}`}><Search size={14} /><span className="hidden sm:inline">Candidates</span></NavLink>
           <NavLink to="/recruiter/analytics" className={({ isActive }) => `inline-flex items-center gap-2 rounded-full px-3 py-2 text-[11px] font-semibold transition sm:px-4 sm:text-xs ${isActive ? 'bg-white text-primary-700 shadow-sm' : 'text-slate-500 hover:text-primary-700'}`}><Activity size={14} /><span className="hidden sm:inline">Analytics</span></NavLink>
+          <NavLink to="/recruiter/assessments" className={({ isActive }) => `inline-flex items-center gap-2 rounded-full px-3 py-2 text-[11px] font-semibold transition sm:px-4 sm:text-xs ${isActive ? 'bg-white text-primary-700 shadow-sm' : 'text-slate-500 hover:text-primary-700'}`}><FileCheck2 size={14} /><span className="hidden sm:inline">ProofCall</span></NavLink>
         </nav>
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="hidden items-center gap-2 rounded-full border border-primary-100 bg-primary-50/60 py-1 pl-1 pr-3 sm:flex">

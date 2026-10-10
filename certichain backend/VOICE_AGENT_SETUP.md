@@ -36,3 +36,41 @@ participant can still open Profile and mint the NFT themselves with MetaMask.
 New signups need to provide a valid mobile number. A participant created before
 this field was added can still receive an in-app request, but the backend skips the
 call until that account has a saved number.
+
+## ProofCall recruiter assessments
+
+ProofCall is a separate recruiter-triggered call flow. The existing internship
+certificate notification call remains unchanged. A recruiter chooses a role in
+`/recruiter`, then explicitly clicks **Call candidate**; the API reads the saved
+candidate phone number from MongoDB and starts the LiveKit SIP call. The voice
+agent identifies itself as AI, says the call transcript will be summarized for
+the recruiter, and tells the candidate they can end the call. There is no prior
+consent gate in this flow.
+
+The worker submits its transcript to the backend callback using a shared secret.
+The backend uses the existing `GOOGLE_API_KEY` to create a structured, evidence-
+based technical report. Candidate phone, transcript, report, and evidence stay in
+MongoDB. In the recruiter **ProofCall** page, the recruiter can send the report's
+SHA-256 digest in a zero-value self-transaction from their MetaMask wallet on
+Sepolia. The backend checks the mined transaction's sender, recipient, chain and
+data before attaching it to the report. No report content is written to the
+blockchain.
+
+Add these settings to `certichain backend/.env` (never to a `VITE_` variable):
+
+    ASSESSMENT_CALLBACK_SECRET=<long random shared secret>
+    CERTICHAIN_API_URL=http://localhost:5000
+    ASSESSMENT_REPORT_MODEL=gemini-3.5-flash-lite
+    SEPOLIA_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
+
+The API and voice worker load that backend `.env`, so the callback secret must be
+identical for both. If the worker is remote, set `CERTICHAIN_API_URL` to a
+publicly reachable HTTPS URL for this backend. The recruiter needs a MetaMask
+wallet with Sepolia ETH only when anchoring a report; call placement itself uses
+the existing LiveKit/Twilio SIP configuration. A candidate without a saved
+mobile number cannot be called.
+
+Open `/recruiter/assessments` to review call status, evidence, transcript and
+proof. Reports without enough candidate speech are explicitly marked insufficient
+instead of receiving invented skill scores. The report is a recruiter aid and
+does not make a hiring decision.

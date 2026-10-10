@@ -1,6 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Award, BookOpenCheck, BriefcaseBusiness, Search, SlidersHorizontal, Users } from 'lucide-react';
+import { Award, BookOpenCheck, BriefcaseBusiness, PhoneCall, Search, SlidersHorizontal, Users } from 'lucide-react';
 import apiClient from '../../services/apiClient';
+import { Link } from 'react-router-dom';
+
+const assessmentRoles = [
+  { key: 'full-stack-intern', title: 'Full Stack Intern' },
+  { key: 'frontend-intern', title: 'Frontend Intern' },
+  { key: 'backend-intern', title: 'Backend Intern' }
+];
 
 const uniqueSorted = (values) => [...new Set(values.filter(Boolean))].sort((a, b) => a.localeCompare(b));
 const certificateTone = {
@@ -29,6 +36,9 @@ export default function CandidateDirectory() {
   const [internshipId, setInternshipId] = useState('');
   const [courseStatus, setCourseStatus] = useState('');
   const [certificateStatus, setCertificateStatus] = useState('');
+  const [assessmentRole, setAssessmentRole] = useState(assessmentRoles[0].key);
+  const [callingCandidate, setCallingCandidate] = useState('');
+  const [callNotice, setCallNotice] = useState({ type: '', message: '' });
 
   useEffect(() => {
     let active = true;
@@ -76,6 +86,19 @@ export default function CandidateDirectory() {
 
   const clearFilters = () => { setSearch(''); setCourseId(''); setCategory(''); setInternshipId(''); setCourseStatus(''); setCertificateStatus(''); };
 
+  const startAssessment = async (candidate) => {
+    setCallingCandidate(candidate._id);
+    setCallNotice({ type: '', message: '' });
+    try {
+      const { data } = await apiClient.post('/recruiter/assessments', { candidateId: candidate._id, roleKey: assessmentRole });
+      setCallNotice({ type: 'success', message: `ProofCall started for ${data.assessment.candidateName}. Track the call and report in Assessments.` });
+    } catch (err) {
+      setCallNotice({ type: 'error', message: err.response?.data?.message || 'The call could not be started.' });
+    } finally {
+      setCallingCandidate('');
+    }
+  };
+
   return <div className="space-y-7">
     <section className="relative overflow-hidden rounded-[26px] border border-primary-100 bg-gradient-to-br from-white via-primary-50 to-[#f1e9ff] px-6 py-8 shadow-[0_20px_55px_-38px_rgba(140,92,196,.35)] sm:px-9 sm:py-10">
       <div className="absolute -right-16 -top-28 h-72 w-72 rounded-full bg-primary-200/50 blur-3xl" />
@@ -99,11 +122,13 @@ export default function CandidateDirectory() {
     </section>
 
     <section>
-      <div className="mb-3 flex items-center justify-between"><h2 className="text-sm font-bold text-slate-900">Candidates <span className="ml-1 rounded-full bg-primary-50 px-2 py-0.5 text-[10px] text-primary-700">{filtered.length}</span></h2><span className="inline-flex items-center gap-1 text-[10px] text-slate-400"><SlidersHorizontal size={12} /> Based on saved database records</span></div>
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3"><h2 className="text-sm font-bold text-slate-900">Candidates <span className="ml-1 rounded-full bg-primary-50 px-2 py-0.5 text-[10px] text-primary-700">{filtered.length}</span></h2><div className="flex flex-wrap items-center gap-3"><label className="flex items-center gap-2 text-[11px] font-semibold text-slate-500">Assessment role<select value={assessmentRole} onChange={(event) => setAssessmentRole(event.target.value)} className="rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-[11px] text-slate-700 outline-none focus:border-primary-300">{assessmentRoles.map((role) => <option key={role.key} value={role.key}>{role.title}</option>)}</select></label><Link to="/recruiter/assessments" className="rounded-lg border border-primary-200 bg-white px-3 py-2 text-[11px] font-bold text-primary-700 hover:bg-primary-50">Assessment reports</Link><span className="inline-flex items-center gap-1 text-[10px] text-slate-400"><SlidersHorizontal size={12} /> Database records</span></div></div>
+      {callNotice.message && <div role="status" className={`mb-4 rounded-xl border p-3 text-xs ${callNotice.type === 'success' ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-rose-200 bg-rose-50 text-rose-700'}`}>{callNotice.message}</div>}
       {error ? <div className="rounded-2xl border border-rose-100 bg-rose-50 p-5 text-sm text-rose-700">{error}</div> : loading ? <div className="grid gap-4 lg:grid-cols-2">{[1, 2, 3, 4].map((id) => <div key={id} className="h-56 animate-pulse rounded-2xl bg-slate-100" />)}</div> : filtered.length === 0 ? <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center"><Users className="mx-auto text-slate-300" size={28} /><p className="mt-3 text-sm font-semibold text-slate-700">No matching candidates</p><p className="mt-1 text-xs text-slate-400">Try clearing one or more filters.</p></div> : <div className="grid gap-4 lg:grid-cols-2">{filtered.map((candidate) => <article key={candidate._id} className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_8px_28px_-22px_rgba(15,23,42,.25)]"><div className="h-1 bg-certi-gradient-purple" /><div className="p-5 sm:p-6"><div className="flex items-center gap-3"><div className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-2xl bg-primary-50 text-sm font-bold text-primary-700">{candidate.profilePicture ? <img src={candidate.profilePicture.startsWith('http') ? candidate.profilePicture : `${import.meta.env.VITE_BACKEND_URL || 'https://nft-project-2y3b.onrender.com'}${candidate.profilePicture}`} alt="" className="h-full w-full object-cover" /> : (candidate.name || 'U').slice(0, 1).toUpperCase()}</div><div className="min-w-0"><h3 className="truncate text-sm font-bold text-slate-900">{candidate.name}</h3><p className="mt-0.5 text-[10px] text-slate-400">CertiChain learner</p></div><span className="ml-auto rounded-full bg-slate-50 px-2.5 py-1 text-[10px] font-semibold text-slate-500">Profile</span></div>
         <div className="mt-5"><p className="text-[10px] font-bold uppercase tracking-[.12em] text-slate-400">Courses · {candidate.courses.length}</p>{candidate.courses.length ? <div className="mt-2 flex flex-wrap gap-1.5">{candidate.courses.map((course) => <span key={course._id} className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${course.status === 'completed' ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-blue-700'}`}>{course.title} · {course.status}</span>)}</div> : <p className="mt-2 text-xs text-slate-400">No course records</p>}</div>
         <div className="mt-4"><p className="text-[10px] font-bold uppercase tracking-[.12em] text-slate-400">Internships · {candidate.internships.length}</p>{candidate.internships.length ? <div className="mt-2 flex flex-wrap gap-1.5">{candidate.internships.map((item) => <span key={item._id} title={item.description} className="rounded-full bg-primary-50 px-2.5 py-1 text-[10px] font-semibold text-primary-700">{item.title} · participant</span>)}</div> : <p className="mt-2 text-xs text-slate-400">No internship records</p>}</div>
         <div className="mt-4 border-t border-slate-100 pt-3"><p className="text-[10px] font-bold uppercase tracking-[.12em] text-slate-400">Certificate requests · {candidate.certificateRequests.length}</p>{candidate.certificateRequests.length ? <div className="mt-2 flex flex-wrap gap-1.5">{candidate.certificateRequests.map((request, index) => <span key={`${request.internshipTitle}-${index}`} className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ring-1 ring-inset ${certificateTone[request.status] || 'bg-slate-50 text-slate-600 ring-slate-500/10'}`}>{request.internshipTitle} · {request.status}</span>)}</div> : <p className="mt-2 text-xs text-slate-400">No certificate request records</p>}</div>
+        <div className="mt-5 flex items-center justify-between gap-3 border-t border-slate-100 pt-4"><p className="text-[10px] leading-4 text-slate-400">Calls the saved account number and starts a role-based AI interview.</p><button type="button" onClick={() => startAssessment(candidate)} disabled={Boolean(callingCandidate)} className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-certi-gradient-purple px-3.5 py-2.5 text-xs font-bold text-white shadow-sm transition hover:brightness-105 disabled:cursor-wait disabled:opacity-60"><PhoneCall size={14} />{callingCandidate === candidate._id ? 'Starting…' : 'Call candidate'}</button></div>
       </div></article>)}</div>}
     </section>
   </div>;

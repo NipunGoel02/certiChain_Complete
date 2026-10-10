@@ -52,6 +52,7 @@ import RecruiterRoute from './components/Auth/RecruiterRoute.jsx';
 import RecruiterLayout from './components/RecruiterLayout.jsx';
 import CandidateDirectory from './pages/recruiter/CandidateDirectory.jsx';
 import RecruiterAnalytics from './pages/recruiter/RecruiterAnalytics.jsx';
+import Assessments from './pages/recruiter/Assessments.jsx';
 
 import './App.css';
 
@@ -106,6 +107,7 @@ function App() {
                 <Route path="/recruiter" element={<RecruiterLayout />}>
                   <Route index element={<CandidateDirectory />} />
                   <Route path="analytics" element={<RecruiterAnalytics />} />
+                  <Route path="assessments" element={<Assessments />} />
                 </Route>
               </Route>
 
