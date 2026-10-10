@@ -63,11 +63,16 @@ router.post('/signup', async (req, res) => {
     if (!e164Phone) {
       return res.status(400).json({ message: 'Enter a valid mobile number with country code' });
     }
+    const signupRole = role || 'user';
+    const publicSignupRoles = ['user', 'hackathon organizer', 'internship', 'recruiter'];
+    if (!publicSignupRoles.includes(signupRole)) {
+      return res.status(400).json({ message: 'This account role cannot be selected during signup' });
+    }
     let user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({ message: 'User already exists' });
     }
-    user = new User({ name, email, password, role, phoneNumber: e164Phone });
+    user = new User({ name, email, password, role: signupRole, phoneNumber: e164Phone });
     await user.save();
 
     // Link any pending internship certificateRequests with this email to the new user

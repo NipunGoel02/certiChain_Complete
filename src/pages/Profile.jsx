@@ -9,6 +9,7 @@ import PendingInvitations from './hackathon/PendingInvitations';
 import TeamInvitations from './hackathon/TeamInvitations';
 import InternshipPendingInvitations from './internship/PendingInvitations';
 import { getCourses } from '../services/courseService';
+import '../styles/Profile.css';
 
 const IPFS_GATEWAYS = [
   'https://gateway.pinata.cloud/ipfs/',
@@ -1353,11 +1354,11 @@ export default function Profile() {
   // --------------------------------------------------
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-100 pb-12">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="profile-page min-h-screen bg-white pb-12">
+      <div className="profile-page__shell container mx-auto px-4 sm:px-6 lg:px-8">
 
         {!currentUser.phoneNumber && (
-          <form onSubmit={saveMobileNumber} className="mt-6 p-5 bg-white rounded-xl shadow-md">
+          <form onSubmit={saveMobileNumber} className="profile-page__phone-form mt-6 p-5 bg-white rounded-xl shadow-md">
             <h2 className="text-lg font-semibold text-gray-800">Add your mobile number</h2>
             <p className="text-sm text-gray-600 mt-1">Your account has no saved number yet, so internship certificate calls cannot reach you.</p>
             <div className="mt-3 flex flex-col sm:flex-row gap-3">
@@ -1381,7 +1382,7 @@ export default function Profile() {
         )}
 
         {/* Share Profile */}
-        <div className="flex justify-end pt-8 mb-2 relative">
+        <div className="profile-page__actions flex justify-end pt-8 mb-2 relative">
           <motion.button
             whileTap={{ scale: 0.96 }}
             whileHover={{
@@ -1441,19 +1442,14 @@ export default function Profile() {
             duration: 0.5,
           }}
         >
-          <div className="bg-gradient-to-br from-purple-600 to-blue-500 rounded-t-xl shadow-lg p-8 text-white mb-2">
-            <h1 className="text-3xl font-bold">
-              Your Profile
-            </h1>
-
-            <p className="mt-2 text-purple-100">
-              Manage your account, courses and
-              certificates
-            </p>
+          <div className="profile-page__hero bg-gradient-to-br from-purple-600 to-blue-500 rounded-t-xl shadow-lg p-8 text-white mb-2">
+            <span className="profile-page__eyebrow">ACCOUNT OVERVIEW</span>
+            <h1 className="text-3xl font-bold">Your Profile</h1>
+            <p className="mt-2 text-purple-100">Manage your account, courses and certificates</p>
           </div>
         </motion.div>
 
-        <div className="bg-white rounded-b-xl shadow-lg overflow-hidden">
+        <div className="profile-page__layout bg-white rounded-b-xl shadow-lg overflow-hidden">
           <div className="md:flex">
 
             {/* =========================================
@@ -1461,7 +1457,7 @@ export default function Profile() {
             ========================================= */}
 
             <motion.div
-              className="md:w-1/3 bg-white p-8"
+              className="profile-page__sidebar md:w-1/3 bg-white p-8"
               initial={{
                 opacity: 0,
                 x: -20,
@@ -1600,7 +1596,7 @@ export default function Profile() {
             ========================================= */}
 
             <motion.div
-              className="md:w-2/3 border-t md:border-t-0 md:border-l border-gray-200"
+              className="profile-page__content md:w-2/3 border-t md:border-t-0 md:border-l border-gray-200"
               initial={{
                 opacity: 0,
               }}
@@ -1618,7 +1614,7 @@ export default function Profile() {
               ===================================== */}
 
               <motion.div
-                className="p-8 border-b border-gray-200"
+                className="profile-page__section p-8 border-b border-gray-200"
                 variants={container}
                 initial="hidden"
                 animate="show"
@@ -1790,7 +1786,7 @@ export default function Profile() {
               ===================================== */}
 
               <motion.div
-                className="p-8 border-b border-gray-200"
+                className="profile-page__section p-8 border-b border-gray-200"
                 variants={container}
                 initial="hidden"
                 animate="show"
@@ -1918,7 +1914,7 @@ export default function Profile() {
               ===================================== */}
 
               <motion.div
-                className="p-8 border-b border-gray-200"
+                className="profile-page__section p-8 border-b border-gray-200"
                 variants={container}
                 initial="hidden"
                 animate="show"
@@ -1942,7 +1938,7 @@ export default function Profile() {
               ===================================== */}
 
               <motion.div
-                className="p-8 border-b border-gray-200"
+                className="profile-page__section p-8 border-b border-gray-200"
                 variants={container}
                 initial="hidden"
                 animate="show"
@@ -2070,7 +2066,7 @@ export default function Profile() {
               ===================================== */}
 
               <motion.div
-                className="p-8 border-b border-gray-200"
+                className="profile-page__section p-8 border-b border-gray-200"
                 variants={container}
                 initial="hidden"
                 animate="show"
@@ -2094,7 +2090,7 @@ export default function Profile() {
               ===================================== */}
 
               <motion.div
-                className="p-8 border-b border-gray-200"
+                className="profile-page__section p-8 border-b border-gray-200"
                 variants={container}
                 initial="hidden"
                 animate="show"
@@ -2118,7 +2114,7 @@ export default function Profile() {
               ===================================== */}
 
               <motion.div
-                className="p-8"
+                className="profile-page__section p-8"
                 variants={container}
                 initial="hidden"
                 animate="show"

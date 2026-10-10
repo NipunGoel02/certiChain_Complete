@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
+import { ArrowLeft, ArrowUpRight, Award, CalendarDays, Check, CircleHelp, Mail, PhoneCall, ShieldCheck, Sparkles } from 'lucide-react';
 
 const CreateInternship = () => {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -21,8 +21,6 @@ const CreateInternship = () => {
     const { name, value } = e.target;
     setFormData((s) => ({ ...s, [name]: value }));
   };
-
-  const prevStep = () => setCurrentStep((s) => Math.max(1, s - 1));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,195 +40,51 @@ const CreateInternship = () => {
       } else {
         alert('Internship request was created. No call was made because the participant account has no saved mobile number.');
       }
-      navigate('/internships/my');
+      navigate('/internships/my-internships');
     } catch (err) {
       setLoading(false);
       setError(err.response?.data?.message || 'Failed to create internship');
     }
   };
 
+  const inputClass = 'w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 shadow-sm outline-none transition placeholder:text-gray-400 hover:border-primary-300 focus:border-primary-500 focus:ring-4 focus:ring-primary-100';
+
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* subtle gradient background + dots */}
-      <div className="absolute inset-0 bg-gradient-to-b from-white via-indigo-50 to-white" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(800px_400px_at_10%_-10%,rgba(139,92,246,0.15),transparent_60%),radial-gradient(900px_500px_at_110%_120%,rgba(236,72,153,0.12),transparent_60%)]" />
+    <div className="mx-auto max-w-6xl">
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div>
+          <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.16em] text-primary-600"><Sparkles size={14} /> New opportunity</div>
+          <h2 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Create an internship</h2>
+          <p className="mt-2 max-w-xl text-sm leading-6 text-slate-500">Add the opportunity details and choose the participant who should receive a certificate request.</p>
+        </div>
+        <button type="button" onClick={() => navigate('/internships/my-internships')} className="inline-flex w-fit items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"><ArrowLeft size={14} /> Back to internships</button>
+      </motion.div>
 
-      <div className="relative container mx-auto px-4 py-12">
-        {/* page heading */}
-        <motion.div
-          initial={{ opacity: 0, y: -12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
-          className="text-center mb-8"
-        >
-          <div className="mx-auto w-12 h-12 rounded-2xl bg-violet-500/90 text-white grid place-items-center shadow-lg shadow-violet-500/25">
-            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M4 7h16M6 11h12m-9 4h6M5 21h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2z" />
-            </svg>
-          </div>
-          <h1 className="mt-3 text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500">
-            Create Internship
-          </h1>
-          <p className="mt-2 text-sm text-gray-500">
-            Generate internship entries with verification and automatically notify participants via email
-          </p>
-        </motion.div>
+      <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_300px]">
+        <motion.form onSubmit={handleSubmit} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="overflow-hidden rounded-2xl border border-primary-100 bg-white shadow-card">
+          <div className="flex items-center gap-3 border-b border-primary-100 px-5 py-4 sm:px-7"><span className="grid h-10 w-10 place-items-center rounded-xl bg-primary-50 text-primary-700"><Award size={19} /></span><div><h3 className="text-sm font-bold text-gray-800">Internship details</h3><p className="mt-0.5 text-[11px] text-gray-500">Fields marked with * are required</p></div><span className="ml-auto rounded-full bg-primary-50 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-primary-700">Step 1 of 1</span></div>
 
-        {/* glassy card */}
-        <motion.form
-          onSubmit={handleSubmit}
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
-          className="mx-auto max-w-3xl rounded-2xl border border-white/60 bg-white/60 backdrop-blur-md shadow-[0_20px_60px_-20px_rgba(59,130,246,0.25)]"
-        >
-          {/* card header bar */}
-          <div className="rounded-t-2xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-5 py-3 text-white">
-            <div className="mx-auto max-w-2xl text-center">
-              <div className="font-semibold">Internship Details</div>
-              <div className="text-[11px] opacity-90">Please fill in all the required information</div>
-            </div>
+          <div className="space-y-5 px-5 py-5 sm:px-7 sm:py-6">
+            <div><label htmlFor="internship-title" className="mb-1.5 block text-xs font-semibold text-gray-700">Internship title <span className="text-primary-600">*</span></label><input id="internship-title" type="text" name="title" value={formData.title} onChange={handleChange} placeholder="e.g. Frontend Development Internship" className={inputClass} required /></div>
+
+            <div><label htmlFor="internship-description" className="mb-1.5 block text-xs font-semibold text-gray-700">Description <span className="text-primary-600">*</span></label><textarea id="internship-description" rows="4" name="description" value={formData.description} onChange={handleChange} placeholder="Describe the work, learning goals, or responsibilities…" className={`${inputClass} resize-y leading-6`} required /><p className="mt-1.5 text-[10px] text-gray-500">A concise description helps the participant understand this record.</p></div>
+
+            <div className="grid gap-4 sm:grid-cols-2"><div><label htmlFor="internship-start" className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-gray-700"><CalendarDays size={13} className="text-gray-400" />Start date <span className="text-primary-600">*</span></label><input id="internship-start" type="datetime-local" name="startDate" value={formData.startDate} onChange={handleChange} className={inputClass} required /></div><div><label htmlFor="internship-end" className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-gray-700"><CalendarDays size={13} className="text-gray-400" />End date <span className="text-primary-600">*</span></label><input id="internship-end" type="datetime-local" name="endDate" value={formData.endDate} onChange={handleChange} className={inputClass} required /></div></div>
+
+            <div><label htmlFor="participant-email" className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-gray-700"><Mail size={13} className="text-gray-400" />Participant email <span className="text-primary-600">*</span></label><input id="participant-email" type="email" name="participantEmail" value={formData.participantEmail} onChange={handleChange} placeholder="participant@example.com" className={inputClass} required /><p className="mt-1.5 text-[10px] text-gray-500">Use the email associated with their CertiChain account.</p></div>
+
+            <div><label htmlFor="certificate-type" className="mb-1.5 block text-xs font-semibold text-gray-700">Certificate type</label><select id="certificate-type" name="certificateType" value={formData.certificateType} onChange={handleChange} className={inputClass}><option value="participation">Participation</option><option value="completion">Completion</option></select></div>
+
+            {error && <div role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs font-medium text-rose-700">{error}</div>}
           </div>
 
-          {/* form body */}
-          <div className="px-5 py-6 md:px-8 md:py-8">
-            {/* title */}
-            <div className="mb-5">
-              <label className="mb-2 block text-sm font-medium text-gray-700">Internship Title</label>
-              <div className="relative">
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  placeholder="e.g., Frontend Development Internship"
-                  className="w-full rounded-xl border border-gray-200 bg-white/70 px-4 py-3 shadow-sm outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-200"
-                  required
-                />
-                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-violet-500">
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M12 6l-2 4-4 .5 3 3-.7 4L12 15l3.7 2.5-.7-4 3-3-4-.5-2-4z" />
-                  </svg>
-                </span>
-              </div>
-            </div>
-
-            {/* description */}
-            <div className="mb-5">
-              <label className="mb-2 block text-sm font-medium text-gray-700">Description</label>
-              <textarea
-                rows="4"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                placeholder="Add a clear description of responsibilities and expectations"
-                className="w-full rounded-xl border border-gray-200 bg-white/70 px-4 py-3 shadow-sm outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-200"
-                required
-              />
-            </div>
-
-            {/* dates */}
-            <div className="mb-5 grid grid-cols-1 gap-5 md:grid-cols-2">
-              <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">Start Date</label>
-                <input
-                  type="datetime-local"
-                  name="startDate"
-                  value={formData.startDate}
-                  onChange={handleChange}
-                  className="w-full rounded-xl border border-gray-200 bg-white/70 px-4 py-3 shadow-sm outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-200"
-                  required
-                />
-              </div>
-              <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">End Date</label>
-                <input
-                  type="datetime-local"
-                  name="endDate"
-                  value={formData.endDate}
-                  onChange={handleChange}
-                  className="w-full rounded-xl border border-gray-200 bg-white/70 px-4 py-3 shadow-sm outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-200"
-                  required
-                />
-              </div>
-            </div>
-
-            {/* email */}
-            <div className="mb-5">
-              <label className="mb-2 block text-sm font-medium text-gray-700">Participant Email</label>
-              <input
-                type="email"
-                name="participantEmail"
-                value={formData.participantEmail}
-                onChange={handleChange}
-                placeholder="participant@domain.com"
-                className="w-full rounded-xl border border-gray-200 bg-white/70 px-4 py-3 shadow-sm outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-200"
-                required
-              />
-              <p className="mt-1 text-[11px] text-gray-500">
-                The participant will be notified at this email address.
-              </p>
-            </div>
-
-            {/* type */}
-            <div className="mb-5">
-              <label className="mb-2 block text-sm font-medium text-gray-700">Certificate Type</label>
-              <select
-                name="certificateType"
-                value={formData.certificateType}
-                onChange={handleChange}
-                className="w-full rounded-xl border border-gray-200 bg-white/70 px-4 py-3 shadow-sm outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-200"
-              >
-                <option value="participation">Participation</option>
-                <option value="completion">Completion</option>
-              </select>
-            </div>
-
-            {/* actions */}
-            <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <button
-                type="button"
-                onClick={prevStep}
-                disabled={currentStep === 1}
-                className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-5 py-3 text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:opacity-50"
-              >
-                Cancel
-              </button>
-
-              <motion.button
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
-                type="submit"
-                disabled={loading}
-                className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-6 py-3 font-semibold text-white shadow-[0_10px_30px_-10px_rgba(147,51,234,0.6)] hover:from-violet-700 hover:to-fuchsia-600 disabled:opacity-70"
-              >
-                {loading ? 'Creating...' : 'Create Internship ✨'}
-              </motion.button>
-            </div>
-
-            {error && <div className="mt-4 text-sm font-medium text-rose-600">{error}</div>}
-          </div>
+          <div className="flex flex-col-reverse gap-3 border-t border-primary-100 bg-primary-50/50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-7"><p className="flex items-start gap-2 text-[10px] leading-4 text-gray-600"><ShieldCheck size={14} className="mt-0.5 shrink-0 text-primary-600" />Review the details before sending the certificate request.</p><motion.button whileHover={{ y: -1 }} whileTap={{ scale: 0.99 }} type="submit" disabled={loading} className="inline-flex items-center justify-center gap-2 rounded-xl bg-certi-gradient-purple px-5 py-3 text-xs font-bold text-white shadow-button transition hover:-translate-y-0.5 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60">{loading ? 'Creating internship…' : 'Create & send request'}{!loading && <ArrowUpRight size={15} />}</motion.button></div>
         </motion.form>
 
-        {/* feature chips */}
-        <div className="mx-auto mt-8 grid max-w-3xl grid-cols-1 gap-4 md:grid-cols-3">
-          {[
-            { icon: '⚡', title: 'Instant Verification', text: 'Entries are quickly verifiable through the system' },
-            { icon: '📬', title: 'Auto Notification', text: 'Participants receive automatic email notifications' },
-            { icon: '🔒', title: 'Secure Storage', text: 'Tamper‑resistant storage for internship records' },
-          ].map((it, i) => (
-            <div
-              key={i}
-              className="rounded-2xl border border-white/70 bg-white/70 p-4 text-center shadow-sm backdrop-blur-md"
-            >
-              <div className="mx-auto mb-2 grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white">
-                <span className="text-lg">{it.icon}</span>
-              </div>
-              <div className="text-sm font-semibold text-gray-800">{it.title}</div>
-              <div className="mt-1 text-xs text-gray-500">{it.text}</div>
-            </div>
-          ))}
-        </div>
+        <aside className="space-y-4">
+          <div className="overflow-hidden rounded-2xl border border-primary-100 bg-white p-5 shadow-card"><div className="mb-4 h-1 w-14 rounded-full bg-certi-gradient-purple" /><span className="grid h-10 w-10 place-items-center rounded-xl bg-primary-50 text-primary-700"><Sparkles size={18} /></span><h3 className="mt-4 text-sm font-bold text-gray-800">What happens next?</h3><p className="mt-1.5 text-[11px] leading-5 text-gray-600">The internship record is created and a certificate request is associated with the participant’s account.</p><div className="mt-5 space-y-3"><div className="flex gap-2.5"><span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-primary-50 text-primary-600"><Check size={12} /></span><p className="text-[10px] leading-4 text-gray-600">Participant is matched by their CertiChain email</p></div><div className="flex gap-2.5"><span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-primary-50 text-primary-600"><Mail size={11} /></span><p className="text-[10px] leading-4 text-gray-600">They can review the request after signing in</p></div><div className="flex gap-2.5"><span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-primary-50 text-primary-600"><PhoneCall size={11} /></span><p className="text-[10px] leading-4 text-gray-600">A call is attempted when their account has a saved mobile number and calling is configured</p></div></div></div>
+          <div className="flex gap-2.5 rounded-2xl border border-primary-100 bg-white p-4 shadow-sm"><CircleHelp size={15} className="mt-0.5 shrink-0 text-primary-500" /><p className="text-[10px] leading-4 text-gray-600">If the participant cannot be found, double-check that the email matches their registered account.</p></div>
+        </aside>
       </div>
     </div>
   );

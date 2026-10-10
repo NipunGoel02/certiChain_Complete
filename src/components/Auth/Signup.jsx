@@ -6,6 +6,7 @@ export default function Signup() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [role, setRole] = useState('user');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [error, setError] = useState('');
@@ -20,8 +21,8 @@ export default function Signup() {
       return;
     }
     try {
-      await signup(email, password, name, 'user', phoneNumber);
-      navigate('/profile');
+      const user = await signup(email, password, name, role, phoneNumber);
+      navigate(user?.role === 'recruiter' ? '/recruiter' : user?.role === 'internship' ? '/internships' : user?.role === 'hackathon organizer' ? '/organizer' : '/profile');
     } catch (err) {
       setError(err.message);
     }
@@ -87,6 +88,15 @@ export default function Signup() {
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
           />
+        </div>
+        <div className="mb-4">
+          <label>Account type</label>
+          <select className="w-full rounded border p-2" value={role} onChange={(e) => setRole(e.target.value)}>
+            <option value="user">Learner</option>
+            <option value="recruiter">Recruiter</option>
+            <option value="internship">Internship Organizer</option>
+            <option value="hackathon organizer">Hackathon Organizer</option>
+          </select>
         </div>
         <button
           type="submit"

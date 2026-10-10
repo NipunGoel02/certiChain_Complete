@@ -6,7 +6,7 @@
   }
   body {
     padding-top: 60px; /* Navbar ki height ke hisaab se adjust kar */
-    background-image: url("./imag.png");
+    background-color: #fff;
   }
   .animation-delay-2000 {
   animation-delay: 2s;
@@ -55,5 +55,19 @@
   
   .read-the-docs {
     color: #888;
+  }
+
+  /* The organizer workspace replaces the fixed public navbar. Let its brand header
+     use the full viewport instead of inheriting the app's centered demo root. */
+  body:has(.internship-portal) {
+    padding-top: 0;
+  }
+
+  #root:has(.internship-portal) {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+    overflow-x: clip;
   }
   

@@ -19,6 +19,13 @@ const isInternshipOrganizer = (req, res, next) => {
   }
 };
 
+const isRecruiter = (req, res, next) => {
+  if (req.user && req.user.role === 'recruiter') {
+    return next();
+  }
+  return res.status(403).json({ message: 'Recruiter access required' });
+};
+
 function auth(req, res, next) {
   const authHeader = req.header('Authorization');
   console.log('Authorization header:', authHeader);
@@ -39,4 +46,4 @@ function auth(req, res, next) {
   }
 }
 
-module.exports = { auth, isAdmin, isInternshipOrganizer };
+module.exports = { auth, isAdmin, isInternshipOrganizer, isRecruiter };

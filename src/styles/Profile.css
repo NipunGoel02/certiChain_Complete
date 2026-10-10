@@ -1,0 +1,181 @@
+.profile-page {
+  --profile-ink: #172033;
+  --profile-muted: #68748b;
+  --profile-purple: #7c3aed;
+  --profile-blue: #3b82f6;
+  color: var(--profile-ink);
+}
+
+.profile-page__shell {
+  max-width: 1480px;
+  padding-top: 0.5rem;
+}
+
+.profile-page__actions {
+  margin-bottom: 0.65rem;
+  padding-top: 0.35rem !important;
+}
+
+.profile-page__actions button {
+  border: 1px solid rgba(124, 58, 237, 0.16);
+  border-radius: 999px;
+  box-shadow: 0 10px 24px -15px rgba(79, 45, 120, 0.8);
+}
+
+.profile-page__hero {
+  position: relative;
+  isolation: isolate;
+  min-height: 140px !important;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 0.35rem;
+  padding: clamp(1.25rem, 3vw, 2rem) clamp(1.25rem, 3vw, 2.4rem) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 22px !important;
+  background: linear-gradient(116deg, #5b21b6 0%, #7041dc 50%, #3478e5 100%) !important;
+  box-shadow: 0 14px 34px -28px rgba(79, 45, 120, 0.45) !important;
+}
+
+.profile-page__hero::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 220px;
+  height: 220px;
+  top: -142px;
+  right: 7%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  box-shadow: 0 0 0 26px rgba(255, 255, 255, 0.04), 0 0 0 56px rgba(255, 255, 255, 0.025);
+}
+
+.profile-page__eyebrow {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.17em;
+}
+
+.profile-page__hero h1 {
+  max-width: 720px;
+  color: #fff;
+  font-size: clamp(1.8rem, 3.2vw, 2.45rem);
+  letter-spacing: -0.045em;
+  line-height: 1.05;
+}
+
+.profile-page__hero p {
+  max-width: 550px;
+  margin-top: 0.15rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+}
+
+.profile-page__layout {
+  margin-top: 1rem;
+  overflow: visible !important;
+  border: 1px solid #e8e9f3;
+  border-radius: 26px !important;
+  box-shadow: 0 20px 55px -40px rgba(30, 41, 59, 0.38) !important;
+}
+
+.profile-page__sidebar {
+  background: linear-gradient(180deg, #faf8ff 0%, #fff 52%) !important;
+  padding: clamp(1.25rem, 3vw, 2.25rem) !important;
+}
+
+.profile-page__sidebar h2 {
+  color: #1e1b4b;
+  letter-spacing: -0.025em;
+}
+
+.profile-page__sidebar > div > p {
+  color: var(--profile-muted);
+  overflow-wrap: anywhere;
+}
+
+.profile-page__sidebar .relative.mx-auto {
+  width: 8.25rem;
+  height: 8.25rem;
+  margin-bottom: 1.25rem;
+  padding: 4px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #a855f7, #3b82f6);
+  box-shadow: 0 12px 30px -16px rgba(91, 33, 182, 0.6);
+}
+
+.profile-page__sidebar .relative.mx-auto > div {
+  width: 100%;
+  height: 100%;
+  border-width: 4px;
+  border-color: white;
+}
+
+.profile-page__content {
+  min-width: 0;
+  border-color: #ececf4 !important;
+}
+
+.profile-page__section {
+  padding: clamp(1.25rem, 3vw, 2rem) !important;
+  border-color: #ececf4 !important;
+}
+
+.profile-page__section h2 {
+  color: #1c2340;
+  font-size: 1.12rem;
+  letter-spacing: -0.025em;
+}
+
+.profile-page__section > div > div:first-child > div:first-child {
+  box-shadow: inset 0 0 0 1px rgba(124, 58, 237, 0.06);
+}
+
+.profile-page__phone-form {
+  border: 1px solid #e7ddff;
+  border-radius: 18px !important;
+  box-shadow: 0 12px 34px -26px rgba(91, 33, 182, 0.55) !important;
+}
+
+.profile-page__phone-form input {
+  min-width: 0;
+  outline-color: #8b5cf6;
+}
+
+@media (min-width: 768px) {
+  .profile-page__layout > .md\:flex {
+    display: grid;
+    grid-template-columns: minmax(260px, 0.34fr) minmax(0, 0.66fr);
+  }
+
+  .profile-page__sidebar,
+  .profile-page__content {
+    width: auto !important;
+  }
+
+  .profile-page__sidebar {
+    border-right: 1px solid #ececf4;
+  }
+}
+
+@media (max-width: 767px) {
+  .profile-page__shell {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .profile-page__hero {
+    min-height: 140px;
+  }
+
+  .profile-page__hero::after {
+    right: -150px;
+  }
+
+  .profile-page__layout {
+    border-radius: 20px !important;
+  }
+}

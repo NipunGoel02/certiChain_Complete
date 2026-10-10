@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import './styles/preloader.css';
 import { useState, useEffect } from 'react';
 import AdminUsers from './pages/AdminUsers.jsx';
@@ -12,7 +12,7 @@ import CourseDetail from './pages/Coursedetail';
 import CourseLearning from './pages/CourseLearning';
 import Quiz from './pages/Quiz';
 import Certificate from './pages/Certificate';
-import { AuthProvider } from './Context/AuthContext';
+import { AuthProvider, useAuth } from './Context/AuthContext';
 import PrivateRoute from './components/Auth/PrivateRoute';
 import AdminRoute from './components/Auth/AdminRoute'; // New admin route component
 import HackathonOrganizerRoute from './components/Auth/HackathonOrganizerRoute'; // New hackathon organizer route component
@@ -45,9 +45,24 @@ import InternshipCertificate from './pages/internship/InternshipCertificate';
 import MyInternships from './pages/internship/MyInternships';
 import InternshipDetail from './pages/internship/InternshipDetail';
 import InternshipOrganizerLayout from './components/InternshipOrganizerLayout';
+import InternshipOverview from './pages/internship/InternshipOverview';
+import InternshipAnalytics from './pages/internship/InternshipAnalytics';
 import PublicProfile from './pages/PublicProfile.jsx';
+import RecruiterRoute from './components/Auth/RecruiterRoute.jsx';
+import RecruiterLayout from './components/RecruiterLayout.jsx';
+import CandidateDirectory from './pages/recruiter/CandidateDirectory.jsx';
+import RecruiterAnalytics from './pages/recruiter/RecruiterAnalytics.jsx';
 
 import './App.css';
+
+function OrganizerAwareChrome({ footer = false }) {
+  const { pathname } = useLocation();
+  const { currentUser } = useAuth();
+  const isOrganizerPortal = (currentUser?.role === 'internship' && pathname.startsWith('/internships')) ||
+    (currentUser?.role === 'recruiter' && pathname.startsWith('/recruiter'));
+  if (isOrganizerPortal) return null;
+  return footer ? <Footer /> : <><Navbar /><div style={{ height: '1px' }} /></>;
+}
 
 function App() {
    const [loading, setLoading] = useState(true);
@@ -71,8 +86,7 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <div className="flex flex-col min-h-screen bg-background">
-          <Navbar />
-          <div style={{ height: '1px' }}></div> {/* Spacer div */}
+          <OrganizerAwareChrome />
 
           <main className="flex-grow">
             <Routes>
@@ -87,6 +101,13 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/public-profile/:id" element={<PublicProfile />} />
+
+              <Route element={<RecruiterRoute />}>
+                <Route path="/recruiter" element={<RecruiterLayout />}>
+                  <Route index element={<CandidateDirectory />} />
+                  <Route path="analytics" element={<RecruiterAnalytics />} />
+                </Route>
+              </Route>
 
               {/* Authenticated User Routes */}
               <Route element={<PrivateRoute />}>
@@ -121,15 +142,19 @@ function App() {
 
               {/* Internship Routes */}
               <Route element={<InternshipOrganizerRoute />}>
-                           <Route path='/internships' element = {<InternshipOrganizerLayout />} />
-                           <Route path="/internships/create" element={<CreateInternship />} />
-                           <Route path="/internships/my-internships" element  = {<MyInternships />} />          
-                           <Route path="/internships/organizer/submissions" element={<InternshipOrganizerSubmissions />} />
-                           <Route path="/internships/organizer/certificates" element={<InternshipOrganizerCertificates />} />
-                           <Route path="/internships/pending-invitations" element={<InternshipPendingInvitations />} />
+                <Route path="/internships" element={<InternshipOrganizerLayout />}>
+                  <Route index element={<InternshipOverview />} />
+                  <Route path="create" element={<CreateInternship />} />
+                  <Route path="my-internships" element={<MyInternships />} />
+                  <Route path="organizer/submissions" element={<InternshipOrganizerSubmissions />} />
+                  <Route path="organizer/certificates" element={<InternshipOrganizerCertificates />} />
+                  <Route path="pending-invitations" element={<InternshipPendingInvitations />} />
+                  <Route path="analytics" element={<InternshipAnalytics />} />
+                  <Route path="candidates" element={<Navigate to="/internships/my-internships" replace />} />
+                  <Route path=":id" element={<InternshipDetail />} />
+                </Route>
               </Route>
               <Route path="/internships/certificate/:internshipId" element={<InternshipCertificate />} />
-              <Route path="/internships/:id" element={<InternshipDetail />} />
 
               {/* Admin Routes */}
               <Route element={<AdminRoute />}>
@@ -147,7 +172,7 @@ function App() {
             </Routes>
           </main>
 
-          <Footer />
+          <OrganizerAwareChrome footer />
         </div>
       </AuthProvider>
     </BrowserRouter>

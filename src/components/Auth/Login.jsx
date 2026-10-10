@@ -21,6 +21,7 @@ export default function Login() {
       if (user?.role === 'admin') navigate('/admin');
       else if (user?.role === 'hackathon organizer') navigate('/organizer');
       else if (user?.role === 'internship') navigate('/internships');
+      else if (user?.role === 'recruiter') navigate('/recruiter');
       else navigate('/profile');
     } catch (err) {
       setError(err.message);
@@ -34,6 +35,7 @@ export default function Login() {
       if (user?.role === 'admin') navigate('/admin');
       else if (user?.role === 'hackathon organizer') navigate('/organizer');
       else if (user?.role === 'internship') navigate('/internships');
+      else if (user?.role === 'recruiter') navigate('/recruiter');
       else navigate('/profile');
     } catch (err) {
       setError(err.message);
@@ -100,9 +102,9 @@ export default function Login() {
               <select value={role} onChange={(e) => setRole(e.target.value)} required className={styles['role-select']}>
                 <option value="" disabled>Select your role</option>
                 <option value="user">Regular User</option>
-                <option value="admin">Administrator</option>
                 <option value="hackathon organizer">Hackathon Organizer</option>
                 <option value="internship">Internship Organizer</option>
+                <option value="recruiter">Recruiter</option>
               </select>
             </div>
             <button type="submit" className={styles.btn}>Sign up</button>

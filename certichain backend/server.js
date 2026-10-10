@@ -10,6 +10,7 @@ const internshipRoutes = require('./routes/internship');
 const adminRoutes = require('./routes/admin');
 const userCompletionRoutes = require('./routes/userCompletion');
 const uploadRoutes = require('./routes/upload');
+const recruiterRoutes = require('./routes/recruiter');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -33,6 +34,7 @@ app.use('/api/nft', nftRoutes);
 
 app.use('/api/userCompletion', userCompletionRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/recruiter', recruiterRoutes);
 
 const MONGO_URI = process.env.MONGO_URI;
 if (!MONGO_URI) {
