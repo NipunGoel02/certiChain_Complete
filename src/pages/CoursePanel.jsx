@@ -156,7 +156,7 @@ const CoursePanel = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
-      className="min-h-screen bg-gradient-to-br from-primary-900 to-primary-700 font-sans text-secondary-100 p-8 md:p-12"
+      className="cc-course-editor min-h-screen font-sans p-8 md:p-12"
     >
       <div className="container mx-auto max-w-4xl bg-white p-8 md:p-12 rounded-3xl shadow-4xl border border-primary-200">
         <motion.h1

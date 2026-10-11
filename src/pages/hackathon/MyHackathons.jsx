@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { ArrowUpRight, CalendarDays, CircleAlert, Plus, Users, Zap } from 'lucide-react';
 
 const MyHackathons = () => {
   const [hackathons, setHackathons] = useState([]);
@@ -12,9 +13,7 @@ const MyHackathons = () => {
       try {
         setLoading(true);
         const response = await axios.get('/api/hackathons/my', {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         });
         setHackathons(response.data);
         setLoading(false);
@@ -23,71 +22,17 @@ const MyHackathons = () => {
         setLoading(false);
       }
     };
-
     fetchMyHackathons();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="text-red-600 text-center mt-8">{error}</div>
-    );
-  }
-
-  if (hackathons.length === 0) {
-    return (
-      <div className="text-center mt-8 text-gray-600">
-        You have not created or joined any hackathons yet.
-      </div>
-    );
-  }
-
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">My Hackathons</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {hackathons.map(hackathon => (
-          <div key={hackathon._id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-            <div className="h-40 bg-gradient-to-r from-purple-500 to-purple-400 relative overflow-hidden">
-              {hackathon.banner ? (
-                <img src={hackathon.banner} alt={hackathon.title} className="w-full h-full object-cover" />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-white text-xl font-bold px-4 text-center z-10">{hackathon.title}</div>
-                </div>
-              )}
-              <div className="absolute top-4 right-4">
-                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                  hackathon.status === 'active' ? 'bg-purple-100 text-purple-800' : 
-                  hackathon.status === 'upcoming' ? 'bg-yellow-100 text-yellow-800' : 
-                  'bg-gray-100 text-gray-800'
-                }`}>
-                  {hackathon.status}
-                </span>
-              </div>
-            </div>
-            <div className="p-6">
-              <h3 className="text-xl font-bold text-gray-800 mb-2">{hackathon.title}</h3>
-              <p className="text-gray-600 mb-4 line-clamp-2">{hackathon.description}</p>
-              <Link
-                to={`/hackathons/${hackathon._id}`}
-                className="block w-full text-center bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300"
-              >
-                View Details
-              </Link>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+  return <main className="cc-data-page">
+    <header className="cc-data-heading"><div><span className="cc-kicker">YOUR EVENTS</span><h1>My hackathons</h1><p>Events you created or joined, gathered in one place.</p></div><Link to="/hackathons/create" className="cc-hackathons__create"><Plus size={16} /> Create event</Link></header>
+    {error ? <section className="cc-state-card cc-state-card--error" role="alert"><CircleAlert /><h2>Couldn’t load your events</h2><p>{error}. Refresh the page to try again.</p></section>
+      : loading ? <div className="cc-event-grid" aria-label="Loading hackathons">{[1, 2, 3].map((item) => <div className="cc-event-skeleton" key={item} />)}</div>
+        : hackathons.length === 0 ? <section className="cc-state-card"><Zap /><h2>No hackathons yet</h2><p>Events you create or join will be listed here.</p><Link to="/hackathons">Explore hackathons</Link></section>
+          : <section className="cc-event-grid" aria-label="My hackathons">{hackathons.map((hackathon) => <article className="cc-event-card" key={hackathon._id}><Link to={`/hackathons/${hackathon._id}`} className="cc-event-card__banner" aria-label={`View ${hackathon.title}`}>
+            {hackathon.banner ? <img src={hackathon.banner} alt="" loading="lazy" /> : <div className="cc-event-card__fallback"><Zap size={30} /><span>{hackathon.title}</span></div>}<span className={`cc-event-status cc-event-status--${hackathon.status}`}>{hackathon.status}</span></Link><div className="cc-event-card__body"><p className="cc-kicker">YOUR EVENT</p><h2><Link to={`/hackathons/${hackathon._id}`}>{hackathon.title}</Link></h2><p className="cc-event-card__description">{hackathon.description}</p><div className="cc-event-card__meta"><span><CalendarDays size={15} />{new Date(hackathon.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} – {new Date(hackathon.endDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>{Array.isArray(hackathon.participants) && <span><Users size={15} />{hackathon.participants.length} participants</span>}</div><Link className="cc-event-card__link" to={`/hackathons/${hackathon._id}`}>View details <ArrowUpRight size={16} /></Link></div></article>)}</section>}
+  </main>;
 };
 
 export default MyHackathons;

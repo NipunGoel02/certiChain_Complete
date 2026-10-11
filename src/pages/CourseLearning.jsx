@@ -95,7 +95,7 @@ const CourseLearning = () => {
   const currentLesson = currentSection.lessons[currentLessonIndex];
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-16 flex flex-col">
+    <div className="cc-learning-page min-h-screen flex flex-col">
       {/* Top Navigation */}
       <div className="bg-white shadow-sm border-b fixed top-16 left-0 right-0 z-10">
         <div className="container mx-auto px-4 py-3">

@@ -19,6 +19,7 @@ const Courses = () => {
   const [courses, setCourses] = useState([]);
   const [filteredCourses, setFilteredCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [category, setCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [categories, setCategories] = useState([
@@ -31,12 +32,12 @@ const Courses = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        // Simulated API call - replace with actual API
         const data = await getCourses();
         setCourses(data);
         setFilteredCourses(data);
       } catch (error) {
         console.error('Error fetching courses:', error);
+        setError('We could not load courses right now. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -64,29 +65,17 @@ const Courses = () => {
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-16 rounded-t-[60px]">
-      <div className="container mx-auto px-4">
+    <main className="cc-catalogue">
+      <div className="cc-catalogue__inner">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-12"
+          className="cc-catalogue__heading"
         >
-<h1 className="text-4xl md:text-5xl font-bold mb-4">
-            <span
-              className="bg-clip-text text-transparent"
-              style={{
-                backgroundImage: 'linear-gradient(to right, rgba(167,117,229,1), rgba(167,117,229,1))',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}
-            >
-              Explore Courses
-            </span>
-          </h1>
-          <p className="mt-4 text-gray-600 text-lg max-w-2xl mx-auto">
-            Discover courses, earn certificates, and build your blockchain credentials
-          </p>
+          <span className="cc-kicker">CERTICHAIN LEARNING</span>
+          <h1>Build skills.<br /><span>Earn credentials.</span></h1>
+          <p>Find a learning path, follow your progress, and keep completed course credentials together.</p>
         </motion.div>
 
         <CourseFilter
@@ -97,10 +86,11 @@ const Courses = () => {
           onSearchChange={handleSearchChange}
         />
 
+        <div className="cc-catalogue__count" aria-live="polite">{loading ? 'Loading available courses…' : `${filteredCourses.length} ${filteredCourses.length === 1 ? 'course' : 'courses'} available`}</div>
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="cc-course-grid" aria-label="Loading courses">
             {[1, 2, 3, 4, 5, 6].map((item) => (
-              <div key={item} className="bg-white rounded-xl shadow-card p-4 h-80">
+              <div key={item} className="cc-course-skeleton" aria-hidden="true">
                 <div className="animate-pulse">
                   <div className="bg-gray-200 h-40 rounded-lg mb-4"></div>
                   <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
@@ -110,12 +100,14 @@ const Courses = () => {
               </div>
             ))}
           </div>
+        ) : error ? (
+          <div className="cc-empty-state" role="alert"><h2>Courses are unavailable</h2><p>{error}</p><button type="button" onClick={() => window.location.reload()}>Try again</button></div>
         ) : filteredCourses.length > 0 ? (
           <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="cc-course-grid"
           >
 {filteredCourses.map(course => (
   <CourseCard key={course._id || course.id} course={course} />
@@ -126,7 +118,7 @@ const Courses = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="text-center py-16"
+            className="cc-empty-state"
           >
             <div className="inline-block p-6 bg-gray-100 rounded-full mb-4">
               <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -138,7 +130,7 @@ const Courses = () => {
           </motion.div>
         )}
       </div>
-    </div>
+    </main>
   );
 };
 

@@ -53,15 +53,17 @@ import RecruiterLayout from './components/RecruiterLayout.jsx';
 import CandidateDirectory from './pages/recruiter/CandidateDirectory.jsx';
 import RecruiterAnalytics from './pages/recruiter/RecruiterAnalytics.jsx';
 import Assessments from './pages/recruiter/Assessments.jsx';
+import WorkspaceEmptyRoute from './components/WorkspaceEmptyRoute.jsx';
 
 import './App.css';
 
 function OrganizerAwareChrome({ footer = false }) {
   const { pathname } = useLocation();
   const { currentUser } = useAuth();
-  const isOrganizerPortal = (currentUser?.role === 'internship' && pathname.startsWith('/internships')) ||
-    (currentUser?.role === 'recruiter' && pathname.startsWith('/recruiter'));
-  if (isOrganizerPortal) return null;
+  const isWorkspace = pathname.startsWith('/recruiter') || pathname.startsWith('/admin') ||
+    pathname.startsWith('/organizer') ||
+    (currentUser?.role === 'internship' && pathname.startsWith('/internships'));
+  if (isWorkspace) return null;
   return footer ? <Footer /> : <><Navbar /><div style={{ height: '1px' }} /></>;
 }
 
@@ -86,10 +88,10 @@ function App() {
 
     <BrowserRouter>
       <AuthProvider>
-        <div className="flex flex-col min-h-screen bg-background">
+        <div className="cc-app">
           <OrganizerAwareChrome />
 
-          <main className="flex-grow">
+          <div className="cc-route-content">
             <Routes>
               {/* Public Routes */} 
                <Route element={<Layout />}></Route>
@@ -128,12 +130,13 @@ function App() {
               <Route element={<HackathonOrganizerRoute />}>
                 <Route path="/hackathons/create" element={<CreateHackathon />} />
                 <Route path="/organizer" element={<HackathonOrganizerLayout />}>
+                  <Route index element={<MyHackathons />} />
                   <Route path="my-hackathons" element={<MyHackathons />} />
                   <Route path="participants" element={<Participants />} />
                   <Route path="submissions" element={<OrganizerSubmissions />} />
-                  <Route path="judging" element={<div>Judging Page (to be implemented)</div>} />
+                  <Route path="judging" element={<WorkspaceEmptyRoute kind="judging" />} />
                 <Route path="certificates" element={<OrganizerCertificates />} />
-                <Route path="analytics" element={<div>Analytics Page (to be implemented)</div>} />
+                <Route path="analytics" element={<WorkspaceEmptyRoute kind="analytics" />} />
               
               </Route>
             </Route>
@@ -172,7 +175,7 @@ function App() {
                 </Route>
               </Route>
             </Routes>
-          </main>
+          </div>
 
           <OrganizerAwareChrome footer />
         </div>

@@ -115,7 +115,7 @@ const CreateHackathon = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
+    <div className="cc-hackathon-form min-h-screen">
       <div className="container mx-auto px-4 py-12">
         <motion.div
           initial={{ opacity: 0, y: -20 }}

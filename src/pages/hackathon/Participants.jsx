@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Award, CircleAlert, Mail, Send, Users } from 'lucide-react';
 
 const Participants = () => {
   const [participants, setParticipants] = useState([]);
@@ -15,9 +16,7 @@ const Participants = () => {
       try {
         setLoading(true);
         const response = await axios.get('/api/hackathons/organizer/participants', {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         });
         setParticipants(response.data);
         setLoading(false);
@@ -30,10 +29,9 @@ const Participants = () => {
   }, []);
 
   const handleCertificateTypeChange = (participantId, value) => {
-    setCertificateTypes(prev => ({ ...prev, [participantId]: value }));
+    setCertificateTypes((prev) => ({ ...prev, [participantId]: value }));
   };
 
-  // Accept the full participant object, not just the ID
   const handleGenerateCertificate = async (participant) => {
     const certificateType = certificateTypes[participant._id] || 'participation';
     setProcessingParticipantId(participant._id);
@@ -43,99 +41,25 @@ const Participants = () => {
       const token = localStorage.getItem('token');
       await axios.post('/api/hackathons/organizer/certificates/generate', {
         participantId: participant._id,
-        hackathonId: participant.hackathonId, // Use backend-provided hackathonId
+        hackathonId: participant.hackathonId,
         certificateType: certificateType
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setSuccessMessage(`Certificate request sent`);
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      setSuccessMessage('Certificate request sent');
     } catch (err) {
-      setErrorMessage(`Failed to send certificate request for `);
+      setErrorMessage('Failed to send certificate request');
     } finally {
       setProcessingParticipantId(null);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="text-red-600 text-center mt-8">{error}</div>
-    );
-  }
-
-  if (participants.length === 0) {
-    return (
-      <div className="text-center mt-8 text-gray-600">
-        No participants found for your hackathons.
-      </div>
-    );
-  }
-
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Participants</h1>
-      {successMessage && (
-        <div className="bg-green-100 text-green-700 p-4 rounded mb-6">
-          {successMessage}
-        </div>
-      )}
-      {errorMessage && (
-        <div className="bg-red-100 text-red-700 p-4 rounded mb-6">
-          {errorMessage}
-        </div>
-      )}
-      <div className="bg-white rounded-xl shadow-md p-6 overflow-x-auto">
-        <table className="min-w-full table-auto">
-          <thead>
-            <tr className="bg-purple-600 text-white">
-              <th className="px-4 py-2">Name</th>
-              <th className="px-4 py-2">Email</th>
-              <th className="px-4 py-2">Hackathon</th>
-              <th className="px-4 py-2">Certificate Type</th>
-              <th className="px-4 py-2">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {participants.map((participant) => (
-              <tr key={participant._id} className="border-b">
-                <td className="px-4 py-2">{participant.name}</td>
-                <td className="px-4 py-2">{participant.email}</td>
-                <td className="px-4 py-2">{participant.hackathonTitle}</td>
-                <td className="px-4 py-2">
-                  <select
-                    value={certificateTypes[participant._id] || 'participation'}
-                    onChange={(e) => handleCertificateTypeChange(participant._id, e.target.value)}
-                    className="border rounded px-2 py-1"
-                  >
-                    <option value="participation">Participation</option>
-                    <option value="winner1">Winner 1st</option>
-                    <option value="winner2">Winner 2nd</option>
-                    <option value="winner3">Winner 3rd</option>
-                  </select>
-                </td>
-                <td className="px-4 py-2">
-                  <button
-                    onClick={() => handleGenerateCertificate(participant)}
-                    disabled={processingParticipantId === participant._id}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-3 rounded"
-                  >
-                    {processingParticipantId === participant._id ? 'Processing...' : 'Generate Certificate'}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
+  return <main className="cc-data-page">
+    <header className="cc-data-heading"><div><span className="cc-kicker">EVENT ROSTER</span><h1>Participants</h1><p>Review people registered across your hackathons and issue their credential requests.</p></div><div className="cc-data-count"><Users size={17} />{loading ? 'Loading' : `${participants.length} participants`}</div></header>
+    {successMessage && <div className="cc-inline-notice cc-inline-notice--success" role="status">{successMessage}</div>}{errorMessage && <div className="cc-inline-notice cc-inline-notice--error" role="alert">{errorMessage}</div>}
+    {error ? <section className="cc-state-card cc-state-card--error" role="alert"><CircleAlert /><h2>Couldn’t load participants</h2><p>{error}. Refresh the page to try again.</p></section>
+      : loading ? <div className="cc-data-skeleton" aria-label="Loading participants"><i /><i /><i /></div>
+        : participants.length === 0 ? <section className="cc-state-card"><Users /><h2>No participants found</h2><p>People registered for your hackathons will appear here.</p></section>
+          : <section className="cc-record-list" aria-label="Hackathon participants">{participants.map((participant) => <article className="cc-participant-row" key={participant._id}><span className="cc-record-icon"><Users size={20} /></span><div className="cc-participant-row__main"><h2>{participant.name || 'Participant'}</h2><p><Mail size={14} />{participant.email || 'Email unavailable'}</p></div><div className="cc-participant-row__internship"><small>HACKATHON</small><strong>{participant.hackathonTitle || 'Hackathon title unavailable'}</strong></div><label className="cc-participant-certificate"><span>Credential type</span><select value={certificateTypes[participant._id] || 'participation'} onChange={(event) => handleCertificateTypeChange(participant._id, event.target.value)}><option value="participation">Participation</option><option value="winner1">Winner 1st</option><option value="winner2">Winner 2nd</option><option value="winner3">Winner 3rd</option></select></label><button type="button" className="cc-issue-button" onClick={() => handleGenerateCertificate(participant)} disabled={processingParticipantId === participant._id}><Send size={15} />{processingParticipantId === participant._id ? 'Sending…' : 'Generate request'}</button></article>)}</section>}
+  </main>;
 };
 
 export default Participants;

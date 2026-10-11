@@ -65,7 +65,7 @@ export default function PublicProfile() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-100 pb-12">
+    <main className="cc-public-profile min-h-screen pb-12">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Animated Header and Share Button */}
         <motion.div
@@ -402,6 +402,6 @@ export default function PublicProfile() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

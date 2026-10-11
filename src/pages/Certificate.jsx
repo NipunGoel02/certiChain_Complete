@@ -902,7 +902,7 @@
     // ====================================================
 
     return (
-      <div className="min-h-screen bg-gray-50 pt-20">
+      <div className="cc-certificate-page min-h-screen">
 
         <div className="container mx-auto px-4 py-8">
 

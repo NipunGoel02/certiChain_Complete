@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { ArrowUpRight, CircleAlert, Code2, ExternalLink, Layers3, Link2, Users } from 'lucide-react';
 
 const OrganizerSubmissions = () => {
   const [submissions, setSubmissions] = useState([]);
@@ -10,12 +11,7 @@ const OrganizerSubmissions = () => {
     const fetchSubmissions = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem('token');
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        };
+        const config = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
         const response = await axios.get('/api/hackathons/organizer/submissions', config);
         setSubmissions(response.data);
         setLoading(false);
@@ -24,79 +20,16 @@ const OrganizerSubmissions = () => {
         setLoading(false);
       }
     };
-
     fetchSubmissions();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="text-red-600 text-center mt-8">{error}</div>
-    );
-  }
-
-  if (submissions.length === 0) {
-    return (
-      <div className="text-center mt-8 text-gray-600">
-        No submissions found for your hackathons.
-      </div>
-    );
-  }
-
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Submissions</h1>
-      <div className="bg-white rounded-xl shadow-md p-6 overflow-x-auto">
-        <table className="min-w-full table-auto">
-          <thead>
-            <tr className="bg-purple-600 text-white">
-              <th className="px-4 py-2">Title</th>
-              <th className="px-4 py-2">Description</th>
-              <th className="px-4 py-2">Project URL</th>
-              <th className="px-4 py-2">Demo URL</th>
-              <th className="px-4 py-2">Tech Stack</th>
-              <th className="px-4 py-2">Challenges</th>
-              <th className="px-4 py-2">Submitted At</th>
-              <th className="px-4 py-2">Hackathon</th>
-            </tr>
-          </thead>
-          <tbody>
-            {submissions.map((submission) => (
-              <tr key={submission._id} className="border-b">
-                <td className="px-4 py-2">{submission.title}</td>
-                <td className="px-4 py-2">{submission.description}</td>
-                <td className="px-4 py-2">
-                  <a href={submission.projectUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                    Link
-                  </a>
-                </td>
-                <td className="px-4 py-2">
-                  {submission.demoUrl ? (
-                    <a href={submission.demoUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                      Link
-                    </a>
-                  ) : (
-                    'N/A'
-                  )}
-                </td>
-                <td className="px-4 py-2">{submission.techStack}</td>
-                <td className="px-4 py-2">{submission.challenges}</td>
-                <td className="px-4 py-2">{new Date(submission.submittedAt).toLocaleString()}</td>
-                <td className="px-4 py-2">{submission.hackathonTitle}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
+  return <main className="cc-data-page">
+    <header className="cc-data-heading"><div><span className="cc-kicker">PROJECT REVIEW</span><h1>Submissions</h1><p>Review project details and links shared by hackathon teams.</p></div><div className="cc-data-count"><Code2 size={17} />{loading ? 'Loading' : `${submissions.length} submissions`}</div></header>
+    {error ? <section className="cc-state-card cc-state-card--error" role="alert"><CircleAlert /><h2>Couldn’t load submissions</h2><p>{error}. Refresh the page to try again.</p></section>
+      : loading ? <div className="cc-data-skeleton" aria-label="Loading submissions"><i /><i /><i /></div>
+        : submissions.length === 0 ? <section className="cc-state-card"><Code2 /><h2>No project submissions</h2><p>Submissions will appear here after teams send their projects.</p></section>
+          : <section className="cc-project-list" aria-label="Hackathon submissions">{submissions.map((submission) => <article className="cc-project-card" key={submission._id}><header><span className="cc-record-icon"><Code2 size={20} /></span><div><span className="cc-kicker">{submission.hackathonTitle || 'HACKATHON'}</span><h2>{submission.title}</h2></div><span className="cc-project-date">{new Date(submission.submittedAt).toLocaleDateString()}</span></header><p>{submission.description}</p><div className="cc-project-stack"><Layers3 size={15} /><span>{submission.techStack || 'Technology stack not provided'}</span></div>{submission.challenges && <p className="cc-project-challenges"><strong>Challenges:</strong> {submission.challenges}</p>}<footer><a href={submission.projectUrl} target="_blank" rel="noopener noreferrer"><Link2 size={14} /> Source project <ExternalLink size={12} /></a>{submission.demoUrl && <a href={submission.demoUrl} target="_blank" rel="noopener noreferrer"><ArrowUpRight size={14} /> Live demo <ExternalLink size={12} /></a>}</footer></article>)}</section>}
+  </main>;
 };
 
 export default OrganizerSubmissions;

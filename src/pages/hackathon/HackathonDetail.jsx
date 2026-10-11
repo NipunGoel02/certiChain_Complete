@@ -157,7 +157,7 @@ const HackathonDetails = () => {
       initial="hidden"
       animate="visible"
       variants={containerVariants}
-      className="min-h-screen bg-gradient-to-br from-primary-900 to-primary-700 font-sans text-secondary-100"
+      className="cc-hackathon-detail min-h-screen font-sans"
     >
       {/* Hero/Banner Section */}
       <div className="h-80 md:h-[500px] bg-certi-gradient-dark-purple relative overflow-hidden flex items-center justify-center">

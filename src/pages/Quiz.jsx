@@ -650,7 +650,7 @@ const Quiz = () => {
   const progress = ((currentQuestion + 1) / questions.length) * 100;
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20 pb-12">
+    <main className="cc-quiz-page min-h-screen pb-12">
 
       {/* ========== TOP CAMERA WITH OVERLAY ========== */}
       <div className="max-w-4xl mx-auto mb-6">
@@ -833,7 +833,7 @@ const Quiz = () => {
         </div>
       </div>
 
-    </div>
+    </main>
   );
 };
 

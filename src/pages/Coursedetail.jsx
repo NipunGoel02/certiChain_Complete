@@ -102,7 +102,7 @@ const CourseDetail = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
-      className="min-h-screen bg-gradient-to-br from-primary-900 to-primary-700 font-sans text-secondary-100"
+      className="cc-course-detail min-h-screen font-sans"
     >
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-primary-700 to-primary-900 text-white py-20 md:py-28 relative overflow-hidden">
